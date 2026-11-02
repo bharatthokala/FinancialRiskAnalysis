@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard | RiskGuard{% endblock %}
+{% block page_name %}Dashboard{% endblock %}
+
+{% block content %}
+
+<!-- PAGE HEADER -->
+<div class="page-heading">
+    <div>
+        <div class="eyebrow">OVERVIEW</div>
+        <h1>Financial Risk Dashboard</h1>
+        <p>Monitor transactions, identify risk patterns, and review alerts.</p>
+    </div>
+
+    <button class="primary-button" id="detectButton" type="button">
+        <i data-lucide="scan-search"></i>
+        <span>Run Risk Detection</span>
+    </button>
+</div>
+
+<!-- NOTIFICATIONS -->
+<div id="notice" class="notice hidden" role="status" aria-live="polite"></div>
+
+<!-- STATISTICS -->
+<section class="stats-grid">
+
+    <article class="stat-card">
+        <div class="stat-top">
+            <span>Total transactions</span>
+            <span class="stat-icon neutral">
+                <i data-lucide="arrow-left-right"></i>
+            </span>
+        </div>
+        <h2 id="totalTransactions">—</h2>
+        <p>Records in database</p>
+    </article>
+
+    <article class="stat-card">
+        <div class="stat-top">
+            <span>Total alerts</span>
+            <span class="stat-icon purple">
+                <i data-lucide="shield-alert"></i>
+            </span>
+        </div>
+        <h2 id="totalAlerts">—</h2>
+        <p>Generated alert records</p>
+    </article>
+
+    <article class="stat-card">
+        <div class="stat-top">
+            <span>High-risk transactions</span>
+            <span class="stat-icon red">
+                <i data-lucide="shield-check"></i>
+            </span>
+        </div>
+        <h2 id="highRiskTransactions">—</h2>
+        <p>Distinct transactions scoring 60+</p>
+    </article>
+
+    <article class="stat-card">
+        <div class="stat-top">
+            <span>Pending reviews</span>
+            <span class="stat-icon amber">
+                <i data-lucide="clock-3"></i>
+            </span>
+        </div>
+        <h2 id="pendingAlerts">—</h2>
+        <p>Alerts awaiting review</p>
+    </article>
+
+</section>
+
+<!-- CHARTS -->
+<section class="charts-grid">
+
+    <article class="panel chart-panel">
+        <div class="panel-heading">
+            <div>
+                <h3>Transaction Activity</h3>
+                <p>Transactions grouped by date</p>
+            </div>
+            <span class="panel-icon">
+                <i data-lucide="activity"></i>
+            </span>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="trendChart"></canvas>
+        </div>
+    </article>
+
+    <article class="panel chart-panel">
+        <div class="panel-heading">
+            <div>
+                <h3>Alerts by Rule</h3>
+                <p>Distribution of triggered rules</p>
+            </div>
+            <span class="panel-icon">
+                <i data-lucide="chart-pie"></i>
+            </span>
+        </div>
+
+        <div class="chart-container doughnut-container">
+            <canvas id="ruleChart"></canvas>
+        </div>
+    </article>
+
+</section>
+
+<!-- REGIONAL ANALYSIS -->
+<section class="panel">
+    <div class="panel-heading">
+        <div>
+            <h3>Transactions by Region</h3>
+            <p>Transaction distribution across recorded regions</p>
+        </div>
+        <span class="panel-icon">
+            <i data-lucide="chart-column"></i>
+        </span>
+    </div>
+
+    <div class="chart-container region-chart">
+        <canvas id="regionChart"></canvas>
+    </div>
+</section>
+
+<!-- RECENT TRANSACTIONS -->
+<section class="panel table-panel">
+    <div class="panel-heading">
+        <div>
+            <h3>Recent Transactions</h3>
+            <p>Latest transaction records</p>
+        </div>
+
+        <a class="text-link" href="{{ url_for('transactions_page') }}">
+            View all
+            <i data-lucide="arrow-up-right"></i>
+        </a>
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Transaction</th>
+                    <th>Account</th>
+                    <th>Amount</th>
+                    <th>Region</th>
+                    <th>Channel</th>
+                    <th>Date &amp; time</th>
+                </tr>
+            </thead>
+
+            <tbody id="recentTransactions">
+                <tr>
+                    <td colspan="6" class="empty-cell">
+                        Loading transactions...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

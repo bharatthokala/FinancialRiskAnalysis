@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics | RiskGuard{% endblock %}
+{% block page_name %}Analytics{% endblock %}
+
+{% block content %}
+
+<!-- PAGE HEADING -->
+<div class="page-heading">
+    <div>
+        <div class="eyebrow">OVERVIEW</div>
+        <h1>Analytics</h1>
+        <p>Monitor transaction activity and risk detection results.</p>
+    </div>
+
+    <button class="primary-button" id="refreshAnalytics" type="button">
+        <i data-lucide="refresh-cw"></i>
+        <span>Refresh Analytics</span>
+    </button>
+</div>
+
+<!-- NOTIFICATION -->
+<div id="analyticsNotice" class="notice hidden" role="status" aria-live="polite"></div>
+
+<!-- ANALYTICS STATISTICS -->
+<section class="stats-grid">
+
+    <div class="stat-card">
+        <div class="stat-top">
+            <span>Total Transactions</span>
+        </div>
+        <h2 id="analyticsTransactions">0</h2>
+        <p>Records in database</p>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-top">
+            <span>Total Alerts</span>
+        </div>
+        <h2 id="analyticsAlerts">0</h2>
+        <p>Generated alert records</p>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-top">
+            <span>High-Risk Transactions</span>
+        </div>
+        <h2 id="analyticsHighRisk">0</h2>
+        <p>Transactions scoring 60+</p>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-top">
+            <span>Pending Alerts</span>
+        </div>
+        <h2 id="analyticsPending">0</h2>
+        <p>Alerts awaiting review</p>
+    </div>
+
+</section>
+
+<!-- ANALYTICS CHARTS -->
+<section class="charts-grid">
+
+    <!-- TRANSACTION TREND -->
+    <article class="panel chart-panel">
+
+        <div class="panel-heading">
+            <div>
+                <h3>Transaction Trend</h3>
+                <p>Transaction activity over time.</p>
+            </div>
+            <span class="panel-icon">
+                <i data-lucide="activity"></i>
+            </span>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="analyticsTrendChart"></canvas>
+        </div>
+
+    </article>
+
+    <!-- ALERTS BY RULE -->
+    <article class="panel chart-panel">
+
+        <div class="panel-heading">
+            <div>
+                <h3>Alerts by Rule</h3>
+                <p>Distribution of triggered risk rules.</p>
+            </div>
+            <span class="panel-icon">
+                <i data-lucide="chart-pie"></i>
+            </span>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="analyticsRuleChart"></canvas>
+        </div>
+
+    </article>
+
+    <!-- TRANSACTIONS BY REGION -->
+    <article class="panel chart-panel">
+
+        <div class="panel-heading">
+            <div>
+                <h3>Transactions by Region</h3>
+                <p>Transaction distribution across recorded regions.</p>
+            </div>
+            <span class="panel-icon">
+                <i data-lucide="chart-column"></i>
+            </span>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="analyticsRegionChart"></canvas>
+        </div>
+
+    </article>
+
+    <!-- RISK DISTRIBUTION -->
+    <article class="panel chart-panel">
+
+        <div class="panel-heading">
+            <div>
+                <h3>Risk Distribution</h3>
+                <p>Transactions grouped by overall risk score.</p>
+            </div>
+            <span class="panel-icon">
+                <i data-lucide="shield-alert"></i>
+            </span>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="analyticsRiskChart"></canvas>
+        </div>
+
+    </article>
+
+</section>
+
+{% endblock %}
+
+<!-- ANALYTICS JAVASCRIPT -->
+{% block scripts %}
+
+<script src="{{ url_for('static', filename='js/analytics.js') }}"></script>
+
+{% endblock %}

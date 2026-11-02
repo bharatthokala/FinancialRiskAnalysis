@@ -1,0 +1,367 @@
+{% extends "base.html" %}
+
+{% block title %}Transactions | RiskGuard{% endblock %}
+{% block page_name %}Transactions{% endblock %}
+
+{% block content %}
+
+<!-- PAGE HEADING -->
+<div class="page-heading">
+    <div>
+        <div class="eyebrow">TRANSACTION MANAGEMENT</div>
+        <h1>Transactions</h1>
+        <p>Create, review, update, and manage financial transactions.</p>
+    </div>
+
+    <div class="toolbar-right">
+        <button type="button"
+                class="secondary-button"
+                id="refreshTransactions">
+            <i data-lucide="refresh-cw"></i>
+            Refresh
+        </button>
+
+        <button type="button"
+                class="primary-button"
+                id="toggleTransactionForm">
+            <i data-lucide="plus"></i>
+            Add Transaction
+        </button>
+    </div>
+</div>
+
+<!-- NOTIFICATIONS -->
+<div id="transactionsNotice"
+     class="notice hidden"
+     role="status"
+     aria-live="polite"></div>
+
+<!-- STATISTICS -->
+<section class="stats-grid">
+
+    <article class="stat-card">
+        <div class="stat-top">
+            <span>Total Transactions</span>
+            <div class="stat-icon neutral">
+                <i data-lucide="activity"></i>
+            </div>
+        </div>
+        <h2 id="transactionsTotal">—</h2>
+        <p>Transaction records in the database</p>
+    </article>
+
+    <article class="stat-card">
+        <div class="stat-top">
+            <span>Total Transaction Value</span>
+            <div class="stat-icon purple">
+                <i data-lucide="indian-rupee"></i>
+            </div>
+        </div>
+        <h2 id="transactionsAmountTotal">—</h2>
+        <p>Combined value of listed transactions</p>
+    </article>
+
+    <article class="stat-card">
+        <div class="stat-top">
+            <span>Accounts Used</span>
+            <div class="stat-icon amber">
+                <i data-lucide="credit-card"></i>
+            </div>
+        </div>
+        <h2 id="transactionsAccountsTotal">—</h2>
+        <p>Unique accounts with transactions</p>
+    </article>
+
+</section>
+
+<!-- CREATE / EDIT TRANSACTION FORM -->
+<section class="panel" id="transactionFormPanel" hidden>
+
+    <div class="panel-heading">
+        <div>
+            <div class="eyebrow" id="transactionFormEyebrow">
+                TRANSACTION DETAILS
+            </div>
+
+            <h3 id="transactionFormTitle">New Transaction</h3>
+
+            <p id="transactionFormDescription">
+                Enter the transaction details below.
+            </p>
+        </div>
+
+        <button type="button"
+                class="icon-button"
+                id="closeTransactionForm"
+                aria-label="Close transaction form">
+            <i data-lucide="x"></i>
+        </button>
+    </div>
+
+    <form id="addTransactionForm">
+
+        <input type="hidden"
+               id="transaction_id"
+               name="transaction_id">
+
+        <div class="form-grid">
+
+            <!-- ACCOUNT -->
+            <div class="form-group">
+                <label for="account_id">
+                    Account <span aria-hidden="true">*</span>
+                </label>
+
+                <select id="account_id"
+                        name="account_id"
+                        required>
+                    <option value="">Loading accounts...</option>
+                </select>
+
+                <small>Select an existing account.</small>
+            </div>
+
+            <!-- DATE -->
+            <div class="form-group">
+                <label for="transaction_datetime">
+                    Date and Time <span aria-hidden="true">*</span>
+                </label>
+
+                <input type="datetime-local"
+                       id="transaction_datetime"
+                       name="transaction_datetime"
+                       required>
+            </div>
+
+            <!-- AMOUNT -->
+            <div class="form-group">
+                <label for="amount">
+                    Amount (INR) <span aria-hidden="true">*</span>
+                </label>
+
+                <input type="number"
+                       id="amount"
+                       name="amount"
+                       min="0.01"
+                       max="9999999999999.99"
+                       step="0.01"
+                       placeholder="Enter amount"
+                       required>
+
+                <small>Amount must be greater than zero.</small>
+            </div>
+
+            <!-- TRANSACTION TYPE -->
+            <div class="form-group">
+                <label for="transaction_type">
+                    Transaction Type <span aria-hidden="true">*</span>
+                </label>
+
+                <select id="transaction_type"
+                        name="transaction_type"
+                        required>
+                    <option value="DEBIT">DEBIT</option>
+                    <option value="CREDIT">CREDIT</option>
+                </select>
+            </div>
+
+            <!-- CHANNEL -->
+            <div class="form-group">
+                <label for="channel">
+                    Channel <span aria-hidden="true">*</span>
+                </label>
+
+                <select id="channel"
+                        name="channel"
+                        required>
+                    <option value="online">Online</option>
+                    <option value="mobile">Mobile</option>
+                    <option value="branch">Branch</option>
+                    <option value="ATM">ATM</option>
+                    <option value="POS">POS</option>
+                </select>
+            </div>
+
+            <!-- REGION -->
+            <div class="form-group">
+                <label for="region">Region</label>
+
+                <input type="text"
+                       id="region"
+                       name="region"
+                       maxlength="100"
+                       placeholder="Enter region (optional)">
+
+                <small>Optional location or transaction region.</small>
+            </div>
+
+        </div>
+
+        <div class="form-actions">
+
+            <button type="submit"
+                    class="primary-button"
+                    id="saveTransactionButton">
+                <i data-lucide="check"></i>
+                Save Transaction
+            </button>
+
+            <button type="button"
+                    class="secondary-button"
+                    id="cancelTransactionForm">
+                Cancel
+            </button>
+
+        </div>
+
+    </form>
+
+</section>
+
+<!-- TRANSACTION DIRECTORY -->
+<section class="panel table-panel">
+
+    <div class="panel-heading">
+        <div>
+            <h3>Transaction Directory</h3>
+            <p>Search, review, edit, and manage transaction records.</p>
+        </div>
+
+        <span class="badge badge-reviewed"
+              id="transactionResultCount">
+            0 transactions
+        </span>
+    </div>
+
+    <!-- SEARCH AND FILTER CONTROLS -->
+    <div class="toolbar">
+
+        <div class="toolbar-left">
+
+            <div class="search-box">
+                <i data-lucide="search"></i>
+
+                <input type="search"
+                       id="transactionSearch"
+                       placeholder="Search ID, account, type, channel, or region..."
+                       aria-label="Search transactions"
+                       autocomplete="off">
+            </div>
+
+        </div>
+
+        <div class="toolbar-right">
+
+            <button type="button"
+                    class="secondary-button"
+                    id="clearTransactionSearch">
+                <i data-lucide="x"></i>
+                Clear Search
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- TRANSACTION TABLE -->
+    <div class="table-wrapper">
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>Transaction ID</th>
+                    <th>Account</th>
+                    <th>Amount (INR)</th>
+                    <th>Type</th>
+                    <th>Channel</th>
+                    <th>Region</th>
+                    <th>Date &amp; Time</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody id="transactionsTableBody">
+
+                <tr>
+                    <td colspan="8" class="empty-cell">
+                        Loading transactions...
+                    </td>
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <!-- TABLE FOOTER -->
+    <div class="panel-heading"
+         style="margin-top: 20px; margin-bottom: 0;">
+
+        <p id="transactionTableSummary">
+            Loading transaction records...
+        </p>
+
+        <button type="button"
+                class="secondary-button"
+                id="transactionTableTop">
+            <i data-lucide="arrow-up"></i>
+            Back to Top
+        </button>
+
+    </div>
+
+</section>
+
+<!-- DELETE CONFIRMATION -->
+<dialog id="deleteTransactionDialog"
+        aria-labelledby="deleteTransactionTitle">
+
+    <div class="panel-heading">
+
+        <div>
+            <div class="eyebrow">CONFIRM ACTION</div>
+
+            <h3 id="deleteTransactionTitle">
+                Delete Transaction?
+            </h3>
+
+            <p id="deleteTransactionDescription">
+                Are you sure you want to delete this transaction?
+            </p>
+        </div>
+
+        <button type="button"
+                class="icon-button"
+                id="closeDeleteTransactionDialog"
+                aria-label="Close confirmation">
+            <i data-lucide="x"></i>
+        </button>
+
+    </div>
+
+    <div class="form-actions">
+
+        <button type="button"
+                class="primary-button"
+                id="confirmDeleteTransaction">
+            <i data-lucide="trash-2"></i>
+            Delete Transaction
+        </button>
+
+        <button type="button"
+                class="secondary-button"
+                id="cancelDeleteTransaction">
+            Cancel
+        </button>
+
+    </div>
+
+</dialog>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/transactions.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics | RiskGuard{% endblock %}
+{% block page_name %}Analytics{% endblock %}
+
+{% block content %}
+
+<div class="page-heading">
+    <div>
+        <div class="eyebrow">INSIGHTS & REPORTING</div>
+        <h1>Risk Analytics</h1>
+        <p>Explore transaction patterns and rule-triggered risk alerts.</p>
+    </div>
+    <button class="primary-button" id="refreshAnalytics">
+        <i data-lucide="refresh-cw"></i> Refresh Analytics
+    </button>
+</div>
+
+<div id="analyticsNotice" class="notice hidden"></div>
+
+<section class="stats-grid">
+    <article class="stat-card">
+        <div class="stat-top">Total Transactions</div>
+        <h2 id="analyticsTransactions">—</h2>
+        <p>Transactions recorded</p>
+    </article>
+
+```
+<article class="stat-card">
+    <div class="stat-top">Total Alerts</div>
+    <h2 id="analyticsAlerts">—</h2>
+    <p>Alert records generated</p>
+</article>
+
+<article class="stat-card">
+    <div class="stat-top">High-Risk Transactions</div>
+    <h2 id="analyticsHighRisk">—</h2>
+    <p>Transactions scoring 60 or above</p>
+</article>
+
+<article class="stat-card">
+    <div class="stat-top">Pending Reviews</div>
+    <h2 id="analyticsPending">—</h2>
+    <p>Alerts awaiting review</p>
+</article>
+```
+
+</section>
+
+<section class="charts-grid">
+    <article class="panel chart-panel">
+        <div class="panel-heading">
+            <div>
+                <h3>Transaction Activity</h3>
+                <p>Number of transactions by date</p>
+            </div>
+        </div>
+        <div class="chart-container">
+            <canvas id="analyticsTrendChart"></canvas>
+        </div>
+    </article>
+
+```
+<article class="panel chart-panel">
+    <div class="panel-heading">
+        <div>
+            <h3>Alerts by Rule</h3>
+            <p>Distribution of triggered rules</p>
+        </div>
+    </div>
+    <div class="chart-container doughnut-container">
+        <canvas id="analyticsRuleChart"></canvas>
+    </div>
+</article>
+```
+
+</section>
+
+<section class="panel">
+    <div class="panel-heading">
+        <div>
+            <h3>Transactions by Region</h3>
+            <p>Distribution across recorded regions</p>
+        </div>
+    </div>
+    <div class="chart-container region-chart">
+        <canvas id="analyticsRegionChart"></canvas>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script src="{{ url_for('static', filename='js/analytics.js') }}"></script>
+
+{% endblock %}

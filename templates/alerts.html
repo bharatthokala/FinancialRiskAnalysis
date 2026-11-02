@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% block title %}Risk Alerts | RiskGuard{% endblock %}
+{% block page_name %}Risk Alerts{% endblock %}
+
+{% block content %}
+
+<!-- Page Heading -->
+<div class="page-heading">
+    <div>
+        <div class="eyebrow">RISK MANAGEMENT</div>
+        <h1>Risk Alerts</h1>
+        <p>Review, search, and investigate transactions flagged by the risk detection system.</p>
+    </div>
+
+    <button class="primary-button" id="refreshAlertsButton" type="button">
+        <i data-lucide="refresh-cw"></i>
+        Refresh Alerts
+    </button>
+</div>
+
+<!-- Notification Area -->
+<div id="alertsNotice" class="notice hidden" role="status" aria-live="polite"></div>
+
+<!-- Alert Statistics -->
+<section class="stats-grid">
+
+    <article class="stat-card">
+        <div class="stat-top">
+            <span>Total Alerts</span>
+            <span class="stat-icon neutral">
+                <i data-lucide="shield-alert"></i>
+            </span>
+        </div>
+        <h2 id="alertsTotal">—</h2>
+        <p>Recorded alert records</p>
+    </article>
+
+    <article class="stat-card">
+        <div class="stat-top">
+            <span>Pending Reviews</span>
+            <span class="stat-icon amber">
+                <i data-lucide="clock"></i>
+            </span>
+        </div>
+        <h2 id="alertsPending">—</h2>
+        <p>Awaiting manual review</p>
+    </article>
+
+    <article class="stat-card">
+        <div class="stat-top">
+            <span>High-Risk Alerts</span>
+            <span class="stat-icon red">
+                <i data-lucide="shield-check"></i>
+            </span>
+        </div>
+        <h2 id="alertsHighRisk">—</h2>
+        <p>Risk score of 60 or above</p>
+    </article>
+
+    <article class="stat-card">
+        <div class="stat-top">
+            <span>Reviewed Alerts</span>
+            <span class="stat-icon purple">
+                <i data-lucide="check-circle"></i>
+            </span>
+        </div>
+        <h2 id="alertsReviewed">—</h2>
+        <p>No longer pending review</p>
+    </article>
+
+</section>
+
+<!-- Alert Records Panel -->
+<section class="panel table-panel">
+
+    <div class="panel-heading">
+        <div>
+            <h3>Alert Records</h3>
+            <p>Search and filter alerts to investigate suspicious activity.</p>
+        </div>
+    </div>
+
+    <!-- Search and Filter Controls -->
+    <div class="alert-filters">
+
+        <div class="alert-filter-field alert-search-field">
+            <label for="alertSearchInput">Search Alerts</label>
+            <div class="alert-search-box">
+                <i data-lucide="search"></i>
+                <input
+                    type="search"
+                    id="alertSearchInput"
+                    placeholder="Alert ID or transaction ID..."
+                    autocomplete="off"
+                >
+            </div>
+        </div>
+
+        <div class="alert-filter-field">
+            <label for="alertStatusFilter">Review Status</label>
+            <select id="alertStatusFilter">
+                <option value="">All Statuses</option>
+                <option value="PENDING">Pending</option>
+                <option value="UNDER_REVIEW">Under Review</option>
+                <option value="RESOLVED">Resolved</option>
+                <option value="FALSE_POSITIVE">False Positive</option>
+            </select>
+        </div>
+
+        <div class="alert-filter-field">
+            <label for="alertRiskFilter">Risk Level</label>
+            <select id="alertRiskFilter">
+                <option value="">All Risk Levels</option>
+                <option value="CRITICAL">Critical</option>
+                <option value="HIGH">High</option>
+                <option value="MEDIUM">Medium</option>
+                <option value="LOW">Low</option>
+            </select>
+        </div>
+
+        <div class="alert-filter-field">
+            <label for="alertStartDate">From Date</label>
+            <input type="date" id="alertStartDate">
+        </div>
+
+        <div class="alert-filter-field">
+            <label for="alertEndDate">To Date</label>
+            <input type="date" id="alertEndDate">
+        </div>
+
+        <div class="alert-filter-field">
+            <label for="alertSortOrder">Sort By</label>
+            <select id="alertSortOrder">
+                <option value="newest">Newest First</option>
+                <option value="oldest">Oldest First</option>
+                <option value="risk_high">Highest Risk Score</option>
+                <option value="risk_low">Lowest Risk Score</option>
+            </select>
+        </div>
+
+        <div class="alert-filter-actions">
+            <button
+                type="button"
+                class="secondary-button"
+                id="resetAlertFiltersButton"
+            >
+                <i data-lucide="rotate-ccw"></i>
+                Reset Filters
+            </button>
+        </div>
+
+    </div>
+
+    <!-- Results Summary -->
+    <div class="alert-results-bar">
+        <span id="alertResultsCount" aria-live="polite">
+            Loading alerts...
+        </span>
+    </div>
+
+    <!-- Alerts Table -->
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Alert ID</th>
+                    <th>Transaction ID</th>
+                    <th>Rule Triggered</th>
+                    <th>Risk Score</th>
+                    <th>Risk Level</th>
+                    <th>Status</th>
+                    <th>Explanation</th>
+                    <th>Created At</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody id="alertsTableBody">
+                <tr>
+                    <td colspan="9" class="empty-cell">
+                        Loading alerts...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/alerts.js') }}"></script>
+{% endblock %}

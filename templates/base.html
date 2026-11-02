@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}RiskGuard | Financial Risk Analysis{% endblock %}</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- Stylesheet -->
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+<div class="app-shell">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+
+        <a href="{{ url_for('dashboard') }}" class="brand">
+            <span class="brand-icon">
+                <i data-lucide="shield-check"></i>
+            </span>
+            <span>RiskGuard<span class="brand-dot">.</span></span>
+        </a>
+
+        <div class="sidebar-label">WORKSPACE</div>
+
+        <nav class="navigation">
+            <a
+                href="{{ url_for('dashboard') }}"
+                class="nav-link {% if request.endpoint in ['dashboard', 'home'] %}active{% endif %}"
+            >
+                <i data-lucide="layout-dashboard"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a
+                href="{{ url_for('transactions_page') }}"
+                class="nav-link {% if request.endpoint == 'transactions_page' %}active{% endif %}"
+            >
+                <i data-lucide="arrow-left-right"></i>
+                <span>Transactions</span>
+            </a>
+
+            <a
+                href="{{ url_for('alerts_page') }}"
+                class="nav-link {% if request.endpoint == 'alerts_page' %}active{% endif %}"
+            >
+                <i data-lucide="shield-alert"></i>
+                <span>Risk Alerts</span>
+            </a>
+
+            <a
+                href="{{ url_for('analytics_page') }}"
+                class="nav-link {% if request.endpoint == 'analytics_page' %}active{% endif %}"
+            >
+                <i data-lucide="chart-no-axes-combined"></i>
+                <span>Analytics</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-label secondary-label">MANAGEMENT</div>
+
+        <nav class="navigation">
+            <a
+                href="{{ url_for('customers_page') }}"
+                class="nav-link {% if request.endpoint == 'customers_page' %}active{% endif %}"
+            >
+                <i data-lucide="users"></i>
+                <span>Customers</span>
+            </a>
+
+            <a
+                href="{{ url_for('accounts_page') }}"
+                class="nav-link {% if request.endpoint == 'accounts_page' %}active{% endif %}"
+            >
+                <i data-lucide="wallet"></i>
+                <span>Accounts</span>
+            </a>
+        </nav>
+
+        <!-- SYSTEM STATUS -->
+        <div class="sidebar-bottom">
+            <div class="system-card">
+                <span class="status-indicator" id="systemIndicator"></span>
+
+                <div>
+                    <strong>System status</strong>
+                    <small id="systemStatus">Checking connection...</small>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                FINANCIAL RISK PLATFORM · v1.0
+            </div>
+        </div>
+
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <!-- TOP BAR -->
+        <header class="topbar">
+
+            <button
+                class="icon-button mobile-menu"
+                id="menuButton"
+                type="button"
+                aria-label="Toggle navigation"
+                aria-expanded="false"
+            >
+                <i data-lucide="menu"></i>
+            </button>
+
+            <div class="breadcrumb">
+                <span>Workspace</span>
+                <i data-lucide="chevron-right"></i>
+                <strong>{% block page_name %}Dashboard{% endblock %}</strong>
+            </div>
+
+            <div class="topbar-right">
+                <span class="live-badge">
+                    <span></span>
+                    LIVE DATA
+                </span>
+
+                <div class="avatar">RA</div>
+            </div>
+
+        </header>
+
+        <!-- PAGE CONTENT -->
+        <section class="page-content">
+            {% block content %}{% endblock %}
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="page-footer">
+            <span>RiskGuard Financial Intelligence</span>
+            <span>For educational and analytical purposes</span>
+        </footer>
+
+    </main>
+
+</div>
+
+<!-- GLOBAL JAVASCRIPT -->
+<script>
+    // Initialize Lucide icons.
+    if (window.lucide) {
+        window.lucide.createIcons();
+    }
+
+    // Mobile navigation.
+    const menuButton = document.getElementById("menuButton");
+    const sidebar = document.getElementById("sidebar");
+
+    if (menuButton && sidebar) {
+        menuButton.addEventListener("click", () => {
+            const isOpen = sidebar.classList.toggle("sidebar-open");
+
+            menuButton.setAttribute(
+                "aria-expanded",
+                String(isOpen)
+            );
+        });
+    }
+
+    // Database health indicator.
+    async function checkSystemHealth() {
+        const statusElement = document.getElementById("systemStatus");
+        const indicator = document.getElementById("systemIndicator");
+
+        try {
+            const response = await fetch("/api/health");
+
+            if (!response.ok) {
+                throw new Error("Health check failed");
+            }
+
+            const data = await response.json();
+            const connected = data.database === "connected";
+
+            if (statusElement) {
+                statusElement.textContent = connected
+                    ? "Database connected"
+                    : "Connection unavailable";
+            }
+
+            if (indicator) {
+                indicator.classList.toggle("offline", !connected);
+            }
+
+        } catch (error) {
+            console.error("System health check:", error);
+
+            if (statusElement) {
+                statusElement.textContent = "Connection unavailable";
+            }
+
+            if (indicator) {
+                indicator.classList.add("offline");
+            }
+        }
+    }
+
+    checkSystemHealth();
+</script>
+
+<!-- PAGE-SPECIFIC JAVASCRIPT -->
+{% block scripts %}{% endblock %}
+
+</body>
+</html>
